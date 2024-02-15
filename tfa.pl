@@ -22,6 +22,7 @@ sub by_frequency{
     $unique_words{$b} <=> $unique_words{$a} or $a cmp $b
 }
 
+#calculates the average word length (not including stopwords)
 sub averageWordLength{
     my @words = @_;
     my $count = ($#words + 1);
@@ -34,6 +35,7 @@ sub averageWordLength{
     return($totalchars/$count);
 }
 
+#identifies the longest and shortest words (excluding indentified stopwords)
 sub largestSmallest{
     my @words = @_;
     my $large = 'a';
@@ -100,9 +102,9 @@ $count_table->row( $line_count, $word_count, $char_count );
 print $count_table->draw;
 
 printf ("\nA total of %d stop words identified. (%d%% of total words)\n", $total_stopwords, (($total_stopwords/$word_count)*100));
+say "(Excluding common stop words from here on out...)\n";
 
 #print the table containing the 10 most common words
-say "(Excluding common stop words from here on out...)\n";
 print fg('springgreen1', "   10 Most-used words\n");
 print $frequent_word_tbl->draw();
 
