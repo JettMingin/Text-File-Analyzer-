@@ -6,9 +6,21 @@ use warnings;
 use Text::SimpleTable::AutoWidth;
 use Term::ExtendedColor qw(:all);
 
-open FILE, "$ARGV[0]" or die "No file found";
-chomp(my @textdoc = <FILE>);
-close FILE;
+my $pastedtext;
+my @textdoc;
+
+if($ARGV[0] =~ /-p/){
+    if ($ARGV[1]){
+        $pastedtext = pastedTextCheck($ARGV[1]);
+        chomp(@textdoc = split("\n", $pastedtext));
+    }else{
+        die "Argument '-p' should be followed with your desired text within double-quotes";
+    }
+}else{
+    open FILE, "$ARGV[0]" or die "No file found";
+    chomp(@textdoc = <FILE>);
+    close FILE;
+}
 
 my @words;
 my @sans_stopwords;
@@ -17,12 +29,20 @@ my $char_count = 0;
 my $word_count = 0;
 my %unique_words;
 
+#making sure the pasted text was within double-quotes
+sub pastedTextCheck{
+    if ($_[0] !~ /\s+/){
+        die fg('red1', "[TFA: REMEMBER TO PUT DOUBLE-QUOTES AROUND YOUR TEXT]");
+    }else{
+        return ($_[0]);
+    }
+}
+
 #SORT SUB unique words in order of apperance 
 sub by_frequency{
     $unique_words{$b} <=> $unique_words{$a} or $a cmp $b
 }
 
-#calculates the average word length (not including stopwords)
 sub averageWordLength{
     my @words = @_;
     my $count = ($#words + 1);
@@ -35,7 +55,6 @@ sub averageWordLength{
     return($totalchars/$count);
 }
 
-#identifies the longest and shortest words (excluding indentified stopwords)
 sub largestSmallest{
     my @words = @_;
     my $large = 'a';
@@ -102,9 +121,9 @@ $count_table->row( $line_count, $word_count, $char_count );
 print $count_table->draw;
 
 printf ("\nA total of %d stop words identified. (%d%% of total words)\n", $total_stopwords, (($total_stopwords/$word_count)*100));
-say "(Excluding common stop words from here on out...)\n";
 
 #print the table containing the 10 most common words
+say "(Excluding common stop words from here on out...)\n";
 print fg('springgreen1', "   10 Most-used words\n");
 print $frequent_word_tbl->draw();
 
